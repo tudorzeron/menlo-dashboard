@@ -189,18 +189,7 @@ footer .v{color:var(--navy);font-weight:700}
 .wp-day.clickable:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(1,58,113,.12);border-color:#cdd9e8}
 .wp-day.clickable::after{content:"✎";position:absolute;top:8px;right:9px;font-size:10px;color:var(--grey);opacity:0;transition:opacity .14s}
 .wp-day.clickable:hover::after{opacity:.6}
-/* ---- CALENDAR EMBED ---- */
-.cal-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px;margin-top:14px}
-.cal-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px}
-.cal-toggles{display:flex;gap:8px;flex-wrap:wrap}
-.cal-btn{font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:#f4f6f9;color:#4a5a6a;cursor:pointer;transition:.14s;font-family:inherit}
-.cal-btn:hover{background:#eef3f9;border-color:#cdd9e8;color:var(--navy)}
-.cal-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
-.cal-note{font-size:10px;color:var(--grey);font-style:italic;margin-bottom:12px;line-height:1.4}
-.cal-frame-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
-.cal-frame{display:none;width:100%;height:600px;border:0}
-.cal-frame.active{display:block}
-@media(max-width:860px){.cal-frame{height:460px}}
+
 </style></head>
 <body><header id="hdr">
   <div class="head-inner">
@@ -247,23 +236,6 @@ footer .v{color:var(--navy);font-weight:700}
     <div class="weekplan-strip" id="weekplan"></div>
   </div>
 
-
-  <div class="cal-wrap">
-    <div class="cal-head">
-      <div class="band-h" style="margin:0"><span class="num" style="background:#4a86e8">📅</span><h2 style="color:#2c5aa0">Calendars</h2><span class="rule"></span></div>
-      <div class="cal-toggles" id="cal-toggles">
-        <button class="cal-btn active" data-cal="msoc" onclick="toggleCal('msoc',this)">📅 My Calendar (TW)</button>
-        <button class="cal-btn" data-cal="transit" onclick="toggleCal('transit',this)">🚐 Ford Transit</button>
-        <button class="cal-btn" data-cal="athletics" onclick="toggleCal('athletics',this)">🏟 Athletics</button>
-      </div>
-    </div>
-    <div class="cal-note">My Calendar syncs from Teamworks automatically. Ford Transit = van availability. Athletics = department-wide games.</div>
-    <div class="cal-frame-wrap">
-      <iframe id="cal-msoc" class="cal-frame active" src="https://calendar.google.com/calendar/embed?src=matthew.tudor%40menlo.edu&ctz=America%2FLos_Angeles&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&mode=MONTH&color=%23013A71" frameborder="0" scrolling="no"></iframe>
-      <iframe id="cal-transit" class="cal-frame" src="https://calendar.google.com/calendar/embed?src=menlo.edu_6u1402lc649bpf2u8kj1vkah64%40group.calendar.google.com&ctz=America%2FLos_Angeles&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&mode=MONTH&color=%23D2522E" frameborder="0" scrolling="no"></iframe>
-      <iframe id="cal-athletics" class="cal-frame" src="https://calendar.google.com/calendar/embed?src=c_95096a5a96ea91cdc341a065458427d13b80315d3336914a7a6ac1004e9de68d%40group.calendar.google.com&ctz=America%2FLos_Angeles&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&mode=MONTH&color=%23A32929" frameborder="0" scrolling="no"></iframe>
-    </div>
-  </div>
 
   <div class="band-h"><span class="num">2</span><h2>Daily Drivers</h2><span class="rule"></span></div>
   <div class="tiles">
@@ -903,14 +875,6 @@ function openPlanEditor(){if(WEEKPLAN_EDIT_URL)window.open(WEEKPLAN_EDIT_URL,"_b
 function shortOpp(o){return o.replace('University','').replace('Cal State ','').replace('Cal Poly ','').replace('CSU ','').trim().split(' ').slice(0,2).join(' ');}
 
 
-function toggleCal(id, btn){
-  // deactivate all
-  document.querySelectorAll('.cal-frame').forEach(f=>f.classList.remove('active'));
-  document.querySelectorAll('.cal-btn').forEach(b=>b.classList.remove('active'));
-  // activate selected
-  document.getElementById('cal-'+id).classList.add('active');
-  btn.classList.add('active');
-}
 
 /* INIT */
 renderDateStrip();renderNextMatch();renderRhythm();renderGameday();renderSchedule();renderTagRow();renderWeather();
