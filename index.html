@@ -630,93 +630,6 @@ footer .v{color:var(--navy);font-weight:700}
         </div>
       </div>
     </div>
-  
-
-  <div class="band-h"><span class="num">4</span><h2>Reference &amp; Admin</h2><span class="rule"></span></div>
-  <div class="tiles ref">
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Conference</div><div class="t-desc">CCAA + cross-play PacWest</div>
-      <div class="t-links">
-        <a class="chip" href="https://goccaa.org/calendar.aspx?path=msoc" target="_blank">CCAA</a>
-        <a class="chip" href="https://thepacwest.com/calendar.aspx?path=general" target="_blank">PacWest</a>
-      </div>
-    </div>
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Office &amp; Forms</div><div class="t-desc">Admin · payroll · rentals · game-day roster</div>
-      <div class="t-links">
-        <a class="chip" href="https://menlocollege.gofmx.com/login" target="_blank">FMX</a>
-        <a class="chip" href="https://workforcenow.adp.com/" target="_blank">ADP</a>
-        <a class="chip" href="https://www.enterprise.com/en/reserve/view-modify-cancel/rental-search.html" target="_blank">Enterprise</a>
-      </div>
-    </div>
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Program OS</div><div class="t-desc">Player handbook</div>
-      <div class="t-links"><a class="chip" href="https://oaks-handbook-learning.netlify.app/" target="_blank">Handbook</a></div>
-    </div>
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Digital Tools</div><div class="t-desc">Deployed app registry</div>
-      <div class="t-links">
-        <a class="chip" href="https://tactical-edge-pied.vercel.app/" target="_blank">Tactical Edge</a>
-        <a class="chip" href="https://gk-session-design-system.vercel.app/" target="_blank">GK System</a>
-        <a class="chip" href="https://menlo-entry-tracker.netlify.app/" target="_blank">Entry Tracker</a>
-        <a class="chip" href="https://menlo-game-model.netlify.app/" target="_blank">Game Model</a>
-      </div>
-    </div>
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Game-Day Ops</div><div class="t-desc">Checklists &amp; logistics</div>
-      <div class="roster-note" style="color:var(--grey);background:#f5f7fa;border-color:#e2e7ee">Home &amp; away checklists — content pending from handbook</div>
-    </div>
-    <div class="tile compact" style="cursor:default">
-      <div class="t-name">Quick Capture</div><div class="t-desc">Jot a note, tag where it routes</div>
-      <div class="qadd">
-        <input id="qadd-in" type="text" placeholder="Log something…" onkeydown="if(event.key==='Enter')addNote()">
-        <button onclick="addNote()">Add</button>
-      </div>
-      <div class="tagrow" id="tagrow"></div>
-      <div id="notes"><div class="note-empty">No notes yet.</div></div>
-    </div>
-  </div>
-  <div class="band-h"><span class="num">5</span><h2>Tactics Board</h2><span class="rule"></span></div>
-  <div id="board-wrap">
-    <div class="board-top">
-      <span class="lbl">Menlo Lineup</span>
-      <div class="board-controls">
-        <button class="bctl" onclick="addLabel()">+ Text</button>
-        <button class="bctl" onclick="clearTeam()">Clear Team</button>
-        <button class="bctl gold" onclick="window.print()">Print / PDF</button>
-      </div>
-    </div>
-    <div class="board-top" style="margin-top:-4px">
-      <span class="lbl" style="color:#b03a3a">Opponent Shape</span>
-      <div class="board-controls">
-        <button class="bctl opp" onclick="setOpp('433')">4-3-3</button>
-        <button class="bctl opp" onclick="setOpp('442')">4-4-2</button>
-        <button class="bctl opp" onclick="setOpp('4231')">4-2-3-1</button>
-        <button class="bctl opp" onclick="setOpp('352')">3-5-2</button>
-        <button class="bctl opp" onclick="clearOpp()">Clear Opp</button>
-        <button class="bctl" style="background:#f1eef5;border-color:#ddd3e6;color:#6b3fa0" onclick="clearAll()">Clear All</button>
-      </div>
-    </div>
-    <div class="board-flex">
-      <div class="bench-rail">
-        <h4>Bench / Squad</h4>
-        <div class="bench-list" id="bench-list"></div>
-      </div>
-      <div class="pitch-box">
-        <svg id="pitch" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg"></svg>
-        <div class="board-hint">Drag a player from the bench onto the pitch to field them. <b>Double-tap</b> a player to mark them goalkeeper (gold). Drag a player off the pitch edge to remove them (Menlo → back to bench, opponent → deleted). Red = opponent shape. Snapshots save in session — Download to keep or share.</div>
-      </div>
-      <div class="snap-panel">
-        <h4>Saved Lineups<span class="shared-badge" id="shared-badge" style="display:none">SHARED</span></h4>
-        <input class="snap-name" id="snap-name" type="text" placeholder="e.g. Starting 11 — 8/22">
-        <button class="bctl gold" style="width:100%;margin-bottom:9px" onclick="saveSnap()">Save Current</button>
-        <div class="snap-list" id="snap-list"><div class="snap-empty">No snapshots yet.</div></div>
-        <div class="snap-io">
-          <button class="bctl" onclick="loadSharedSnaps()">↻ Refresh</button>
-          <button class="bctl" onclick="downloadSnaps()">↓ Backup</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <footer>
@@ -1327,7 +1240,7 @@ function bpMergeSessions(existing,incoming){
   return {sessions:[...m.values()].sort((a,b)=>a.d<b.d?-1:1),added,updated};
 }
 /*BP-CALC-END*/
-/* INIT */
+
 
 const BP_LS={sess:"bp_sessions_v1",alias:"bp_aliases_v1",pos:"bp_positions_v1",status:"bp_status_v1",map:"bp_mappings_v1",set:"bp_settings_v1"};
 function bpLoad(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
@@ -2004,6 +1917,7 @@ document.addEventListener("DOMContentLoaded",bpInit);
 
 </script>
 </body></html
+/* INIT */
 renderDateStrip();renderNextMatch();renderRhythm();renderGameday();renderSchedule();renderTagRow();renderWeather();
 players=[];oppPlayers=[];renderBench();drawPitch();loadSharedSnaps();renderWeekPlan();
 loadHealth();
