@@ -1245,13 +1245,11 @@ function bpMergeSessions(existing,incoming){
 const BP_LS={sess:"bp_sessions_v1",alias:"bp_aliases_v1",pos:"bp_positions_v1",status:"bp_status_v1",map:"bp_mappings_v1",set:"bp_settings_v1"};
 function bpLoad(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
 function bpSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-let bpSessions=bpLoad(BP_LS.sess,[]);
-let bpAliases=bpLoad(BP_LS.alias,{});
-let bpPositions=bpLoad(BP_LS.pos,{});
-let bpStatuses=bpLoad(BP_LS.status,{});
-let bpMappings=bpLoad(BP_LS.map,{});
-let bpSettings=Object.assign({view:"daily",metric:"dist",method:"ewma",pos:"ALL",sheetsUrl:"",demo:false,open:false,sortCol:"acwr",sortDir:-1},bpLoad(BP_LS.set,{}));
+let bpSessions=[],bpAliases={},bpPositions={},bpStatuses={},bpMappings={};
+let bpSettings={view:"daily",metric:"dist",method:"ewma",pos:"ALL",sheetsUrl:"",demo:false,open:false,sortCol:"acwr",sortDir:-1};
 let bpPending=null,bpPendingAliases=null,bpModalPlayer=null,bpMainChart=null,bpPmChart=null;
+// Defer localStorage load so it doesn't block script init
+try{bpSessions=bpLoad(BP_LS.sess,[]);bpAliases=bpLoad(BP_LS.alias,{});bpPositions=bpLoad(BP_LS.pos,{});bpStatuses=bpLoad(BP_LS.status,{});bpMappings=bpLoad(BP_LS.map,{});bpSettings=Object.assign(bpSettings,bpLoad(BP_LS.set,{}));}catch(e){console.warn('BP localStorage unavailable',e);}
 const BP_API={enabled:false,endpoint:"",key:"",
   /* When Beyond Pulse (or another vendor) provides API access, point endpoint at a
      Vercel serverless proxy (e.g. /api/beyondpulse) that returns JSON rows:
