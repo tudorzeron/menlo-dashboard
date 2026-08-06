@@ -148,8 +148,6 @@ footer .v{color:var(--navy);font-weight:700}
 .bench-chip .bdot.GTD{background:#1B4E7A;border-color:#1B4E7A}
 .bench-chip .bn{font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bench-chip .byr{font-size:9px;color:var(--grey);font-weight:700;margin-left:auto}
-.bench-tier{font-size:8.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--grey);margin:7px 0 2px;padding-bottom:2px;border-bottom:1px solid var(--line)}
-.bench-tier:first-child{margin-top:0}
 /* health feed list */
 .health-grid{display:flex;flex-direction:column;gap:3px;max-height:320px;overflow-y:auto;margin-top:6px}
 .health-row{font-size:11.5px;padding:5px 0;border-bottom:1px solid #f0f3f7}
@@ -964,9 +962,8 @@ function enableDrag(g,i,team){let dragging=false;const svg=document.getElementBy
 /* BENCH RAIL — drag a player onto the pitch to field them */
 let healthByName={}; // "First Last" -> status
 function renderBench(){const el=document.getElementById('bench-list');
-  let out='',lastTier=null;
+  let out='';
   ROSTER.forEach((p,i)=>{const full=p.f+' '+p.l;const st=healthByName[full]||'';
-    if(p.tier!==lastTier){out+=`<div class="bench-tier">${TIER_LABELS[p.tier]||''}</div>`;lastTier=p.tier;}
     const fielded=fieldedIdx.has(i)?'fielded':'';
     const disp=p.f+(p.l?' '+p.l.charAt(0)+'.':'');
     out+=`<div class="bench-chip ${fielded}" draggable="false" data-ri="${i}" onclick="benchClick(event,${i})" onmousedown="benchGrab(event,${i})" ontouchstart="benchGrab(event,${i})"><span class="bdot ${st}"></span><span class="bn">${disp}</span><span class="byr">${p.pos}</span></div>`;});
