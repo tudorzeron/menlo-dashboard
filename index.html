@@ -148,6 +148,8 @@ footer .v{color:var(--navy);font-weight:700}
 .bench-chip .bdot.GTD{background:#1B4E7A;border-color:#1B4E7A}
 .bench-chip .bn{font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bench-chip .byr{font-size:9px;color:var(--grey);font-weight:700;margin-left:auto}
+.bench-tier{font-size:8.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--grey);margin:7px 0 2px;padding-bottom:2px;border-bottom:1px solid var(--line)}
+.bench-tier:first-child{margin-top:0}
 /* health feed list */
 .health-grid{display:flex;flex-direction:column;gap:3px;max-height:320px;overflow-y:auto;margin-top:6px}
 .health-row{font-size:11.5px;padding:5px 0;border-bottom:1px solid #f0f3f7}
@@ -653,22 +655,23 @@ const ATH={"Sacramento State": "https://hornetsports.com/sports/mens-soccer", "S
 const SCOUT="https://docs.google.com/spreadsheets/d/1e75LtPFnOadvnf1RjrijTEOlmzEH5hVG_oSWkR9fN2w/edit";
 const HOME="Atherton, CA";
 const ROSTER=[
- {"f":"Samuel","l":"Archer","yr":"SR"},{"f":"Gavin","l":"Baker","yr":"SO"},
- {"f":"Aidan","l":"Bautista","yr":"SR"},{"f":"Liam","l":"Bittenstam","yr":"SO"},
- {"f":"Davis","l":"Boogman","yr":"SR"},{"f":"Adam","l":"Cao","yr":"FR"},
- {"f":"Alan","l":"Castro","yr":"JR"},{"f":"Ugo","l":"Dabricot","yr":"FR"},
- {"f":"James","l":"Downes","yr":"SO"},{"f":"Enrico","l":"Ehret","yr":"JR"},
- {"f":"Liam","l":"Elliott","yr":"JR"},{"f":"Hugo","l":"Few","yr":"SO"},
- {"f":"Marcos","l":"Garcia","yr":"JR"},{"f":"Matti","l":"Klause","yr":"FR"},
- {"f":"Vebjorn","l":"Madshus","yr":"FR"},{"f":"D'Angelo","l":"Manzano","yr":"JR"},
- {"f":"Manuel","l":"Portillo","yr":"SO"},{"f":"Josh","l":"Ramos","yr":"JR"},
- {"f":"Derek","l":"Rash","yr":"FR"},{"f":"Roy","l":"Rosenberg","yr":"SR"},
- {"f":"Diego","l":"Ruiz","yr":"JR"},{"f":"Jonathan","l":"Sald","yr":"SR"},
- {"f":"Tim","l":"Schwarz","yr":"SR"},{"f":"Harnoor","l":"Sidhu","yr":"JR"},
- {"f":"Giuseppe","l":"Sigala","yr":"SO"},{"f":"Janne","l":"Spangenberg","yr":"SO"},
- {"f":"Jerimiah","l":"Stiles","yr":"FR"},{"f":"Hugo","l":"Thompson","yr":"FR"},
- {"f":"Jaxon","l":"Tonley","yr":"SO"}
+ {"f":"Davis","l":"Boogman","yr":"SR","pos":"CB","tier":1},{"f":"Hugo","l":"Few","yr":"SO","pos":"CAM","tier":1},
+ {"f":"Marcos","l":"Garcia","yr":"JR","pos":"CM/RB","tier":1},{"f":"Vebjorn","l":"Madshus","yr":"FR","pos":"GK","tier":1},
+ {"f":"Roy","l":"Rosenberg","yr":"SR","pos":"LB","tier":1},{"f":"Tim","l":"Schwarz","yr":"SR","pos":"ST","tier":1},
+ {"f":"Giuseppe","l":"Sigala","yr":"SO","pos":"CM","tier":1},{"f":"Enrico","l":"Ehret","yr":"JR","pos":"W","tier":2},
+ {"f":"Matti","l":"Klause","yr":"FR","pos":"ST","tier":2},{"f":"Diego","l":"Ruiz","yr":"JR","pos":"CM","tier":2},
+ {"f":"Hugo","l":"Thompson","yr":"FR","pos":"CB","tier":2},{"f":"Samuel","l":"Archer","yr":"SR","pos":"CB","tier":3},
+ {"f":"Gavin","l":"Baker","yr":"SO","pos":"CM","tier":3},{"f":"Aidan","l":"Bautista","yr":"SR","pos":"RB","tier":3},
+ {"f":"Liam","l":"Bittenstam","yr":"SO","pos":"CB","tier":3},{"f":"Alan","l":"Castro","yr":"JR","pos":"LB","tier":3},
+ {"f":"Ugo","l":"Dabricot","yr":"FR","pos":"W","tier":3},{"f":"James","l":"Downes","yr":"SO","pos":"RB","tier":3},
+ {"f":"Liam","l":"Elliott","yr":"JR","pos":"RW","tier":3},{"f":"D'Angelo","l":"Manzano","yr":"JR","pos":"GK","tier":3},
+ {"f":"Manuel","l":"Portillo","yr":"SO","pos":"ST","tier":3},{"f":"Josh","l":"Ramos","yr":"JR","pos":"ST/W","tier":3},
+ {"f":"Jonathan","l":"Sald","yr":"SR","pos":"CM","tier":3},{"f":"Harnoor","l":"Sidhu","yr":"JR","pos":"CM","tier":3},
+ {"f":"Janne","l":"Spangenberg","yr":"SO","pos":"RW","tier":3},{"f":"Jaxon","l":"Tonley","yr":"SO","pos":"GK","tier":3},
+ {"f":"Adam","l":"Cao","yr":"FR","pos":"RB","tier":4},{"f":"Derek","l":"Rash","yr":"FR","pos":"GK","tier":4},
+ {"f":"Jerimiah","l":"Stiles","yr":"FR","pos":"CB","tier":4}
 ];
+const TIER_LABELS={1:"Starters",2:"Starter / Rotation",3:"Rotation",4:"Redshirt / Developmental"};
 // ===== PASTE PUBLISHED CSV URL BELOW (File > Share > Publish to web > CSV) =====
 const HEALTH_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSDuvJvsZ8TMQbEoGv_Xt_O7aDuiqif-L3AhX79GIY2YWYUhTjMsFqg-Rq4Ffxp68rLj6SBTNEXMWJ2/pub?gid=1331879416&single=true&output=csv";  // live trainer health feed
 // ===== PASTE APPS SCRIPT WEB APP URL BELOW (Deploy > Web app > /exec) =====
@@ -961,10 +964,13 @@ function enableDrag(g,i,team){let dragging=false;const svg=document.getElementBy
 /* BENCH RAIL — drag a player onto the pitch to field them */
 let healthByName={}; // "First Last" -> status
 function renderBench(){const el=document.getElementById('bench-list');
-  el.innerHTML=ROSTER.map((p,i)=>{const full=p.f+' '+p.l;const st=healthByName[full]||'';
+  let out='',lastTier=null;
+  ROSTER.forEach((p,i)=>{const full=p.f+' '+p.l;const st=healthByName[full]||'';
+    if(p.tier!==lastTier){out+=`<div class="bench-tier">${TIER_LABELS[p.tier]||''}</div>`;lastTier=p.tier;}
     const fielded=fieldedIdx.has(i)?'fielded':'';
     const disp=p.f+(p.l?' '+p.l.charAt(0)+'.':'');
-    return `<div class="bench-chip ${fielded}" draggable="false" data-ri="${i}" onclick="benchClick(event,${i})" onmousedown="benchGrab(event,${i})" ontouchstart="benchGrab(event,${i})"><span class="bdot ${st}"></span><span class="bn">${disp}</span><span class="byr">${p.yr}</span></div>`;}).join('');}
+    out+=`<div class="bench-chip ${fielded}" draggable="false" data-ri="${i}" onclick="benchClick(event,${i})" onmousedown="benchGrab(event,${i})" ontouchstart="benchGrab(event,${i})"><span class="bdot ${st}"></span><span class="bn">${disp}</span><span class="byr">${p.pos}</span></div>`;});
+  el.innerHTML=out;}
 function benchGrab(e,ri){
   if(fieldedIdx.has(ri))return; // already on pitch
   e.preventDefault();
