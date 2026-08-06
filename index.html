@@ -141,7 +141,7 @@ footer .v{color:var(--navy);font-weight:700}
 .bench-chip{display:flex;align-items:center;gap:7px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:11.5px;cursor:grab;user-select:none}
 .bench-chip:hover{background:#eef3f9;border-color:#cdd9e8}
 .bench-chip.fielded{opacity:.4}
-.bench-chip .bdot{width:11px;height:11px;border-radius:50%;background:var(--navy);flex:0 0 auto;border:2px solid var(--navy)}
+.bench-chip .bdot{width:11px;height:11px;border-radius:50%;background:#d4dbe4;flex:0 0 auto;border:2px solid #d4dbe4}
 .bench-chip .bdot.AVAILABLE{background:#3FB950;border-color:#3FB950}
 .bench-chip .bdot.LIMITED{background:#D98B2B;border-color:#D98B2B}
 .bench-chip .bdot.OUT{background:#C0392B;border-color:#C0392B}
@@ -1065,6 +1065,7 @@ async function saveSnap(){const nm=document.getElementById('snap-name').value.tr
     snaps.unshift({name:nm,formation:'custom',data:{players:JSON.parse(JSON.stringify(players)),opp:JSON.parse(JSON.stringify(oppPlayers)),labels:JSON.parse(JSON.stringify(labels)),fielded:[...fieldedIdx]}});
     document.getElementById('snap-name').value='';renderSnaps();return;}
   const btn=event&&event.target;if(btn){btn.textContent='Saving…';btn.disabled=true;}
+  sharedSnaps.unshift(Object.assign({id:'pending',created:new Date().toISOString()},snap));renderSnaps();
   try{await fetch(SNAPSHOT_API_URL,{method:'POST',body:JSON.stringify({action:'save',snapshot:snap})});
     document.getElementById('snap-name').value='';await loadSharedSnaps();
   }catch(e){alert('Could not save to shared store. Saved this session only.');
@@ -1072,13 +1073,16 @@ async function saveSnap(){const nm=document.getElementById('snap-name').value.tr
   if(btn){btn.textContent='Save Current';btn.disabled=false;}
 }
 
+let snapLoadError=false,snapRetries=0;
 async function loadSharedSnaps(){const b=document.getElementById("shared-badge");if(b&&SNAPSHOT_API_URL)b.style.display="inline-block";if(!SNAPSHOT_API_URL){renderSnaps();return;}
+  const el=document.getElementById('snap-list');
+  if(el&&!sharedSnaps.length)el.innerHTML='<div class="snap-empty">Loading shared lineups…</div>';
   try{const r=await fetch(SNAPSHOT_API_URL+'?action=list&_cb='+Date.now(),{cache:'no-store'});
-    sharedSnaps=await r.json();if(!Array.isArray(sharedSnaps))sharedSnaps=[];}
-  catch(e){sharedSnaps=[];}
+    sharedSnaps=await r.json();if(!Array.isArray(sharedSnaps))sharedSnaps=[];snapLoadError=false;snapRetries=0;}
+  catch(e){snapLoadError=true;if(snapRetries<2){snapRetries++;setTimeout(loadSharedSnaps,4000);}}
   renderSnaps();}
 
-function loadSnap(id){const s=sharedSnaps.find(x=>x.id===id)||snaps[id];if(!s)return;
+function loadSnap(id){if(id==='pending')return;const s=sharedSnaps.find(x=>x.id===id)||snaps[id];if(!s)return;
   const d=s.data||s;players=JSON.parse(JSON.stringify(d.players||[]));
   oppPlayers=JSON.parse(JSON.stringify(d.opp||[]));labels=JSON.parse(JSON.stringify(d.labels||[]));fieldedIdx=new Set(d.fielded||[]);
   drawPitch();renderBench();}
@@ -1092,7 +1096,7 @@ async function delSnap(id){
 
 function renderSnaps(){const el=document.getElementById('snap-list');
   const list = SNAPSHOT_API_URL ? sharedSnaps : snaps;
-  if(!list.length){el.innerHTML='<div class="snap-empty">No saved lineups yet.</div>';return;}
+  if(!list.length){el.innerHTML=snapLoadError?'<div class="snap-empty" style="color:#b03a3a">Couldn\'t reach the shared store — retrying… (or tap ↻ Refresh)</div>':'<div class="snap-empty">No saved lineups yet.</div>';return;}
   el.innerHTML=list.map((s,i)=>{
     const id = SNAPSHOT_API_URL ? s.id : i;
     const when = s.created ? new Date(s.created).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}) : '';
