@@ -88,6 +88,8 @@ header::after{content:"";position:absolute;right:-40px;top:-60px;width:320px;hei
 .qadd{display:flex;gap:9px;margin-top:4px}
 .qadd input{flex:1;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:13px;font-family:inherit}
 .qadd input:focus{outline:none;border-color:var(--navy-line)}
+.notes-more{display:block;width:100%;margin-top:6px;padding:5px 0;font-size:11px;font-weight:600;color:var(--navy);background:#f5f7fa;border:1px solid #e2e7ee;border-radius:8px;cursor:pointer}
+.notes-more:hover{background:#eef2f7}
 .qadd button{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:0 16px;font-weight:700;font-size:13px;cursor:pointer}
 .qadd button:hover{background:var(--navy-line)}
 .tagrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
@@ -651,20 +653,21 @@ const ATH={"Sacramento State": "https://hornetsports.com/sports/mens-soccer", "S
 const SCOUT="https://docs.google.com/spreadsheets/d/1e75LtPFnOadvnf1RjrijTEOlmzEH5hVG_oSWkR9fN2w/edit";
 const HOME="Atherton, CA";
 const ROSTER=[
- {"f":"D'Angelo","l":"Manzano","yr":"JR"},{"f":"Liam","l":"Eliott","yr":"JR"},
- {"f":"Derek","l":"Rash","yr":"FR"},{"f":"Aidan","l":"Bautista","yr":"SR"},
- {"f":"James","l":"Downes","yr":"SO"},{"f":"Stone","l":"Watring","yr":"SO"},
- {"f":"Brian","l":"Chang","yr":"SR"},{"f":"Jaxon","l":"Tonley","yr":"SO"},
- {"f":"Samuel","l":"Archer","yr":"SR"},{"f":"Manuel","l":"Portillo","yr":"SO"},
- {"f":"Hugo","l":"Few","yr":"SO"},{"f":"Davis","l":"Boogman","yr":"SR"},
- {"f":"Giuseppe","l":"Sigala","yr":"SO"},{"f":"Jonathan","l":"Sald","yr":"SR"},
- {"f":"Harnoor","l":"Sidhu","yr":"JR"},{"f":"Roy","l":"Rosenberg","yr":"SR"},
- {"f":"Liam","l":"Bittenstam","yr":"SO"},{"f":"Tim","l":"Schwarz","yr":"SR"},
- {"f":"Janne","l":"Spangenberg","yr":"SO"},{"f":"Enrico","l":"Ehret","yr":"JR"},
- {"f":"Adam","l":"Cao","yr":"FR"},{"f":"Ugo","l":"Dabricot","yr":"FR"},
- {"f":"Jeremiah","l":"Stiles","yr":"FR"},{"f":"Alan","l":"Castro","yr":"JR"},
- {"f":"Josh","l":"Ramos","yr":"JR"},{"f":"Adrian","l":"Fuster Juretzki","yr":"JR"},
- {"f":"Matti","l":"Klause","yr":"FR"}
+ {"f":"Samuel","l":"Archer","yr":"SR"},{"f":"Gavin","l":"Baker","yr":"SO"},
+ {"f":"Aidan","l":"Bautista","yr":"SR"},{"f":"Liam","l":"Bittenstam","yr":"SO"},
+ {"f":"Davis","l":"Boogman","yr":"SR"},{"f":"Adam","l":"Cao","yr":"FR"},
+ {"f":"Alan","l":"Castro","yr":"JR"},{"f":"Ugo","l":"Dabricot","yr":"FR"},
+ {"f":"James","l":"Downes","yr":"SO"},{"f":"Enrico","l":"Ehret","yr":"JR"},
+ {"f":"Liam","l":"Elliott","yr":"JR"},{"f":"Hugo","l":"Few","yr":"SO"},
+ {"f":"Marcos","l":"Garcia","yr":"JR"},{"f":"Matti","l":"Klause","yr":"FR"},
+ {"f":"Vebjorn","l":"Madshus","yr":"FR"},{"f":"D'Angelo","l":"Manzano","yr":"JR"},
+ {"f":"Manuel","l":"Portillo","yr":"SO"},{"f":"Josh","l":"Ramos","yr":"JR"},
+ {"f":"Derek","l":"Rash","yr":"FR"},{"f":"Roy","l":"Rosenberg","yr":"SR"},
+ {"f":"Diego","l":"Ruiz","yr":"JR"},{"f":"Jonathan","l":"Sald","yr":"SR"},
+ {"f":"Tim","l":"Schwarz","yr":"SR"},{"f":"Harnoor","l":"Sidhu","yr":"JR"},
+ {"f":"Giuseppe","l":"Sigala","yr":"SO"},{"f":"Janne","l":"Spangenberg","yr":"SO"},
+ {"f":"Jerimiah","l":"Stiles","yr":"FR"},{"f":"Hugo","l":"Thompson","yr":"FR"},
+ {"f":"Jaxon","l":"Tonley","yr":"SO"}
 ];
 // ===== PASTE PUBLISHED CSV URL BELOW (File > Share > Publish to web > CSV) =====
 const HEALTH_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSDuvJvsZ8TMQbEoGv_Xt_O7aDuiqif-L3AhX79GIY2YWYUhTjMsFqg-Rq4Ffxp68rLj6SBTNEXMWJ2/pub?gid=1331879416&single=true&output=csv";  // live trainer health feed
@@ -804,19 +807,29 @@ function toggleAcc(btn,id){btn.classList.toggle('open');document.getElementById(
 const TAGS=[{n:"Recruiting",c:"#013A71",b:"#e7f0fa"},{n:"Training",c:"#1E7A33",b:"#e3f4e7"},
  {n:"Scouting",c:"#8A5A12",b:"#fbf0dc"},{n:"Logistics",c:"#1B4E7A",b:"#e7eef6"},
  {n:"Program-HQ",c:"#6b3fa0",b:"#efe7f6"},{n:"Personal",c:"#555",b:"#eef0f2"}];
-let activeTag="Training";let notes=[];
+let activeTag="Training";
+const QNOTES_KEY="qcap_notes_v1";
+function qLoad(){try{const v=localStorage.getItem(QNOTES_KEY);return v?JSON.parse(v):[];}catch(e){return [];}}
+function qPersist(){try{localStorage.setItem(QNOTES_KEY,JSON.stringify(notes));}catch(e){}}
+let notes=qLoad();let notesExpanded=false;
+function fmtNoteTs(n){if(typeof n.ts==="string")return n.ts;const d=new Date(n.ts);const t=d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});return (new Date().toDateString()===d.toDateString())?t:d.toLocaleDateString("en-US",{month:"numeric",day:"numeric"})+" · "+t;}
 function renderTagRow(){const el=document.getElementById('tagrow');
   el.innerHTML=TAGS.map(t=>{const on=t.n===activeTag;
     const style=on?`background:${t.b};color:${t.c};border-color:${t.c}`:"";
     return `<span class="tagbtn ${on?'':'off'}" style="${style}" onclick="setTag('${t.n}')">${t.n}</span>`;}).join('');}
 function setTag(n){activeTag=n;renderTagRow();}
 function addNote(){const inp=document.getElementById('qadd-in');const v=inp.value.trim();if(!v)return;
-  notes.unshift({t:v,tag:activeTag,ts:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});inp.value='';renderNotes();}
-function delNote(i){notes.splice(i,1);renderNotes();}
+  notes.unshift({t:v,tag:activeTag,ts:Date.now()});inp.value='';qPersist();renderNotes();}
+function delNote(i){notes.splice(i,1);qPersist();renderNotes();}
+function toggleNotes(){notesExpanded=!notesExpanded;renderNotes();}
 function renderNotes(){const el=document.getElementById('notes');
   if(!notes.length){el.innerHTML='<div class="note-empty">No notes yet.</div>';return;}
-  el.innerHTML=notes.map((n,i)=>{const tg=TAGS.find(x=>x.n===n.tag)||TAGS[5];
-    return `<div class="note-item"><span class="ntag" style="background:${tg.b};color:${tg.c}">${n.tag}</span><span class="ntxt">${n.t} <span style="color:var(--grey);font-size:10px">· ${n.ts}</span></span><button onclick="delNote(${i})">×</button></div>`;}).join('');}
+  const shown=notesExpanded?notes:notes.slice(0,5);
+  let out=shown.map((n,i)=>{const tg=TAGS.find(x=>x.n===n.tag)||TAGS[5];
+    return `<div class="note-item"><span class="ntag" style="background:${tg.b};color:${tg.c}">${n.tag}</span><span class="ntxt">${n.t} <span style="color:var(--grey);font-size:10px">· ${fmtNoteTs(n)}</span></span><button onclick="delNote(${i})">×</button></div>`;}).join('');
+  if(notes.length>5)out+=`<button class="notes-more" onclick="toggleNotes()">${notesExpanded?'Show recent':'Show all ('+notes.length+')'}</button>`;
+  el.innerHTML=out;}
+renderNotes();
 
 /* ===== TACTICS BOARD ===== */
 const PITCH_W=680,PITCH_H=440;
